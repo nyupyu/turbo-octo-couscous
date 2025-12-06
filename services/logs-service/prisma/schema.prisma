@@ -1,0 +1,27 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Log {
+  id          String   @id @default(uuid())
+  timestamp   DateTime @default(now())
+  serviceName String   @map("service_name")
+  action      String
+  userId      String?  @map("user_id")
+  details     Json?
+  ipAddress   String   @map("ip_address")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([serviceName])
+  @@index([action])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("logs")
+}
