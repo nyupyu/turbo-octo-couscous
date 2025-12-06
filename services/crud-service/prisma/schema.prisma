@@ -1,0 +1,45 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  capacity    Int
+  equipment   String[]
+  isAvailable Boolean   @default(true) @map("is_available")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  bookings    Booking[]
+
+  @@map("rooms")
+}
+
+model Booking {
+  id        String        @id @default(uuid())
+  roomId    String        @map("room_id")
+  userId    String        @map("user_id")
+  startTime DateTime      @map("start_time")
+  endTime   DateTime      @map("end_time")
+  purpose   String
+  status    BookingStatus @default(ACTIVE)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  ACTIVE
+  CANCELLED
+  COMPLETED
+}
